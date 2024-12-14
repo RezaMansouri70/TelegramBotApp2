@@ -12,9 +12,9 @@ namespace TelegramBotApp.Controllers
     {
         private readonly TelegramBotClient _botClient;
 
-        // Initialize bot with your Telegram bot token
         public BotController()
         {
+            // Replace with your actual bot token
             _botClient = new TelegramBotClient("7657833224:AAE8Vn2ds2jhUg7Xyqst-K_rL-YWnuFNJFk");  // Replace with your token
         }
 
@@ -24,7 +24,7 @@ namespace TelegramBotApp.Controllers
             if (update?.Message != null)
             {
                 var chatId = update.Message.Chat.Id;
-                var messageText = update.Message.Text; 
+                var messageText = update.Message.Text;
 
                 // If /start is sent, show menu with inline buttons
                 if (messageText.StartsWith("/start"))
@@ -33,45 +33,71 @@ namespace TelegramBotApp.Controllers
                     {
                         new[]
                         {
-                            new InlineKeyboardButton { Text = "تماس با ما", Url = "https://t.me/alireza_ghassmi" }, // لینک تماس
-                            new InlineKeyboardButton { Text = "لیست املاک", CallbackData = "/list_properties" } // برای نمایش لیست املاک
+                            new InlineKeyboardButton { Text = "تماس با ما", Url = "https://t.me/alireza_ghassmi" },
+                            new InlineKeyboardButton { Text = "لیست املاک", CallbackData = "/list_properties" }
                         },
                         new[]
                         {
-                            new InlineKeyboardButton { Text = "مشاوره آنلاین", CallbackData = "/consultation" },
+                            // New button for consultation with a link to an online consultation page
+                            new InlineKeyboardButton { Text = "مشاوره آنلاین", Url = "https://t.me/alireza_ghassmin" },
                             new InlineKeyboardButton { Text = "درباره‌ی ونوس", CallbackData = "/about_venus" }
                         }
                     });
 
-                    await _botClient.SendTextMessageAsync(chatId, "به ربات املاکی ونوس خوش آمدید! لطفا یکی از گزینه‌ها را انتخاب کنید:", replyMarkup: keyboard);
-                }
-                else if (messageText.StartsWith("/list_properties"))
-                {
-                    // This would ideally list real estate properties
-                    await _botClient.SendTextMessageAsync(chatId, "در حال حاضر، ما املاک زیر را داریم:\n\n1. ویلا در نور\n2. خانه ویلایی در نور");
-                }
-                else if (messageText.StartsWith("/consultation"))
-                {
-                    await _botClient.SendTextMessageAsync(chatId, "برای مشاوره آنلاین، لطفا با شماره زیر تماس بگیرید:\n\n09195636195");
-                }
-                else if (messageText.StartsWith("/about_venus"))
-                {
-                    await _botClient.SendTextMessageAsync(chatId, "ونوس املاک در شهر نور فعالیت می‌کند و به شما کمک می‌کند تا بهترین ملک‌ها را برای خرید و فروش پیدا کنید.");
-                }
-                else
-                {
-                    await _botClient.SendTextMessageAsync(chatId, "من این پیام را متوجه نشدم. لطفا از گزینه‌های موجود استفاده کنید.");
+                    await _botClient.SendTextMessageAsync(chatId, "به بوت املاکی ونوس خوش آمدید! لطفا یکی از گزینه‌ها را انتخاب کنید:", replyMarkup: keyboard);
                 }
             }
 
-            return Ok();
-        }
+            // Handling Callback Queries (When a user clicks an inline button)
+            if (update?.CallbackQuery != null)
+            {
+                var chatId = update.CallbackQuery.Message.Chat.Id;
+                var callbackData = update.CallbackQuery.Data;
 
-        // Endpoint to check the bot's webhook status
-        [HttpGet("status")]
-        public IActionResult GetStatus()
-        {
-            return Ok("Telegram bot is running!");
+                if (callbackData == "/list_properties")
+                {
+                    // If user clicked "لیست املاک" button
+                    await _botClient.SendTextMessageAsync(chatId, "در حال حاضر، ما املاک زیر را داریم:");
+
+                    // Now sending multiple images for villas
+                    var mediaGroup = new List<IAlbumInputMedia>
+                    {
+                        new InputMediaPhoto("https://www.arcaonline.ir/vila/2.jpg"),
+                        new InputMediaPhoto("https://www.arcaonline.ir/vila/4.jpg"),
+                        new InputMediaPhoto("https://www.arcaonline.ir/vila/3.jpg"),
+                        new InputMediaPhoto("https://www.arcaonline.ir/vila/1.jpg")
+                    };
+
+                    // Send images as media group (gallery)
+                    await _botClient.SendMediaGroupAsync(chatId, mediaGroup);
+                }
+                else if (callbackData == "/about_venus")
+                {
+                    // Detailed information about Venus Real Estate
+                    await _botClient.SendTextMessageAsync(chatId, "ونوس املاک در شهر نور یکی از معتبرترین شرکت‌های املاک است که با هدف فراهم کردن بهترین گزینه‌ها برای خرید، فروش و اجاره ملک فعالیت می‌کند. "
+                        + "\n\nویژگی‌های ونوس:\n"
+                        + "- مشاوره رایگان و تخصصی در انتخاب ملک\n"
+                        + "- انواع ویلا، آپارتمان و زمین\n"
+                        + "- تضمین کیفیت و قیمت مناسب\n"
+                        + "\nما افتخار داریم که بهترین خدمات را به مشتریان خود ارائه می‌دهیم.\n"
+                        + "\nبرای مشاهده جزئیات بیشتر و املاک جدید به وب‌سایت ما مراجعه کنید");
+
+                    // Optionally you can add more images about properties or team, etc.
+                    var mediaGroup = new List<IAlbumInputMedia>
+                    {
+                        new InputMediaPhoto("https://www.arcaonline.ir/vila/1.jpg"),
+                        new InputMediaPhoto("https://www.arcaonline.ir/vila/2.jpg"),
+                        new InputMediaPhoto("https://www.arcaonline.ir/vila/3.jpg")
+                    };
+
+                    await _botClient.SendMediaGroupAsync(chatId, mediaGroup);
+                }
+
+                // Optionally acknowledge callback to remove the loading state
+                await _botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id);
+            }
+
+            return Ok();
         }
     }
 }
