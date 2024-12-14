@@ -33,7 +33,7 @@ namespace TelegramBotApp.Controllers
                     {
                         new[]
                         {
-                            new InlineKeyboardButton { Text = "تماس با ما", Url = "https://t.me/your_contact_link" }, // لینک تماس
+                            new InlineKeyboardButton { Text = "تماس با ما", Url = "https://t.me/alireza_ghassmi" }, // لینک تماس
                             new InlineKeyboardButton { Text = "لیست املاک", CallbackData = "/list_properties" } // برای نمایش لیست املاک
                         },
                         new[]
@@ -43,7 +43,7 @@ namespace TelegramBotApp.Controllers
                         }
                     });
 
-                    await _botClient.SendTextMessageAsync(chatId, "به بوت املاکی ونوس خوش آمدید! لطفا یکی از گزینه‌ها را انتخاب کنید:", replyMarkup: keyboard);
+                    await _botClient.SendTextMessageAsync(chatId, "به ربات املاکی ونوس خوش آمدید! لطفا یکی از گزینه‌ها را انتخاب کنید:", replyMarkup: keyboard);
                 }
                 else if (messageText.StartsWith("/list_properties"))
                 {
