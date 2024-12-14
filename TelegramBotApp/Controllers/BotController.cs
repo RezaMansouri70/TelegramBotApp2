@@ -23,6 +23,8 @@ namespace TelegramBotApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Update update)
         {
+            _logger.LogInformation("Received message re: {MessageText}", System.Text.Json.JsonSerializer.Serialize(update));
+
             if (update?.Message != null)
             {
                 var chatId = update.Message.Chat.Id;
