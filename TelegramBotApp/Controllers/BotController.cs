@@ -11,11 +11,13 @@ namespace TelegramBotApp.Controllers
     public class BotController : ControllerBase
     {
         private readonly TelegramBotClient _botClient;
+        private readonly ILogger<BotController> _logger;
 
-        public BotController()
+        public BotController(ILogger<BotController> logger)
         {
             // Replace with your actual bot token
             _botClient = new TelegramBotClient("7657833224:AAE8Vn2ds2jhUg7Xyqst-K_rL-YWnuFNJFk");  // Replace with your token
+            _logger = logger;
         }
 
         [HttpPost]
@@ -25,6 +27,8 @@ namespace TelegramBotApp.Controllers
             {
                 var chatId = update.Message.Chat.Id;
                 var messageText = update.Message.Text;
+
+                _logger.LogInformation("Received message from chat ID {ChatId}: {MessageText}", chatId, messageText);
 
                 // If /start is sent, show menu with inline buttons
                 if (messageText.StartsWith("/start"))
@@ -38,13 +42,13 @@ namespace TelegramBotApp.Controllers
                         },
                         new[]
                         {
-                            // New button for consultation with a link to an online consultation page
-                            new InlineKeyboardButton { Text = "مشاوره آنلاین", Url = "https://t.me/alireza_ghassmin" },
+                            new InlineKeyboardButton { Text = "مشاوره آنلاین", Url = "https://t.me/alireza_ghassmi" },
                             new InlineKeyboardButton { Text = "درباره‌ی ونوس", CallbackData = "/about_venus" }
                         }
                     });
 
                     await _botClient.SendTextMessageAsync(chatId, "به بوت املاکی ونوس خوش آمدید! لطفا یکی از گزینه‌ها را انتخاب کنید:", replyMarkup: keyboard);
+                    _logger.LogInformation("Sent start message with inline buttons to chat ID {ChatId}", chatId);
                 }
             }
 
@@ -54,6 +58,9 @@ namespace TelegramBotApp.Controllers
                 var chatId = update.CallbackQuery.Message.Chat.Id;
                 var callbackData = update.CallbackQuery.Data;
 
+                _logger.LogInformation("Received callback query with data: {CallbackData}", callbackData);
+
+                // Check if user clicked on "لیست املاک"
                 if (callbackData == "/list_properties")
                 {
                     // If user clicked "لیست املاک" button
@@ -70,6 +77,7 @@ namespace TelegramBotApp.Controllers
 
                     // Send images as media group (gallery)
                     await _botClient.SendMediaGroupAsync(chatId, mediaGroup);
+                    _logger.LogInformation("Sent media group with villa images to chat ID {ChatId}", chatId);
                 }
                 else if (callbackData == "/about_venus")
                 {
@@ -80,21 +88,14 @@ namespace TelegramBotApp.Controllers
                         + "- انواع ویلا، آپارتمان و زمین\n"
                         + "- تضمین کیفیت و قیمت مناسب\n"
                         + "\nما افتخار داریم که بهترین خدمات را به مشتریان خود ارائه می‌دهیم.\n"
-                        + "\nبرای مشاهده جزئیات بیشتر و املاک جدید به وب‌سایت ما مراجعه کنید");
+                        + "\nبرای مشاهده جزئیات بیشتر و املاک جدید به وب‌سایت ما مراجعه کنید: https://yourwebsite.com");
 
-                    // Optionally you can add more images about properties or team, etc.
-                    var mediaGroup = new List<IAlbumInputMedia>
-                    {
-                        new InputMediaPhoto("https://www.arcaonline.ir/vila/1.jpg"),
-                        new InputMediaPhoto("https://www.arcaonline.ir/vila/2.jpg"),
-                        new InputMediaPhoto("https://www.arcaonline.ir/vila/3.jpg")
-                    };
-
-                    await _botClient.SendMediaGroupAsync(chatId, mediaGroup);
+                    _logger.LogInformation("Sent information about Venus Real Estate to chat ID {ChatId}", chatId);
                 }
 
                 // Optionally acknowledge callback to remove the loading state
                 await _botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id);
+                _logger.LogInformation("Acknowledged callback query with ID {CallbackQueryId}", update.CallbackQuery.Id);
             }
 
             return Ok();
