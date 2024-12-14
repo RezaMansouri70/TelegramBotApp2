@@ -24,7 +24,7 @@ namespace TelegramBotApp.Controllers
             if (update?.Message != null)
             {
                 var chatId = update.Message.Chat.Id;
-                var messageText = update.Message.Text;
+                var messageText = update.Message.Text; 
 
                 // If /start is sent, show menu with inline buttons
                 if (messageText.StartsWith("/start"))
