@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -55,6 +56,14 @@ namespace TelegramBotApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Update update)
         {
+
+            // خواندن داده خام از بدنه درخواست
+            using var reader = new StreamReader(Request.Body, Encoding.UTF8);
+            var requestBody = await reader.ReadToEndAsync();
+
+            // لاگ داده خام
+            Console.WriteLine($"Raw Update: {requestBody}");
+
             LogAllProperties(update);
 
             _logger.LogInformation("Received message re: {MessageText}", System.Text.Json.JsonSerializer.Serialize(update));
