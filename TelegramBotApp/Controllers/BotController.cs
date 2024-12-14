@@ -19,10 +19,44 @@ namespace TelegramBotApp.Controllers
             _botClient = new TelegramBotClient("7657833224:AAE8Vn2ds2jhUg7Xyqst-K_rL-YWnuFNJFk");  // Replace with your token
             _logger = logger;
         }
+        private void LogAllProperties(object obj, string prefix = "")
+        {
+            if (obj == null)
+            {
+                Console.WriteLine($"{prefix}null");
+                return;
+            }
 
+            var type = obj.GetType();
+            Console.WriteLine($"{prefix}{type.Name}:");
+
+            foreach (var property in type.GetProperties())
+            {
+                try
+                {
+                    var value = property.GetValue(obj);
+
+                    if (value is string || value == null || property.PropertyType.IsValueType)
+                    {
+                        Console.WriteLine($"{prefix}  {property.Name}: {value}");
+                    }
+                    else
+                    {
+                        // برای آبجکت‌های پیچیده‌تر به صورت بازگشتی عمل می‌کند
+                        LogAllProperties(value, prefix + "  ");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{prefix}  {property.Name}: Error reading property - {ex.Message}");
+                }
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Update update)
         {
+            LogAllProperties(update);
+
             _logger.LogInformation("Received message re: {MessageText}", System.Text.Json.JsonSerializer.Serialize(update));
 
             if (update?.Message != null)
