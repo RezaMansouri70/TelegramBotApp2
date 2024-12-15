@@ -111,7 +111,30 @@ public class UpdateHandler : IUpdateHandler
                 break;
 
             case "view_villa_photos":
-                await SendVillaPhotos(callbackQuery.Message!.Chat.Id);
+                await _botClient.SendTextMessageAsync(
+                    chatId: callbackQuery.Message!.Chat.Id,
+                    text: "تصاویر ویلاهای منتخب:");
+
+                var photos = new[]
+                {
+                    "https://arcaonline.ir/vila/1.jpg",
+                    "https://arcaonline.ir/vila/2.jpg",
+                    "https://arcaonline.ir/vila/4.jpg",
+
+                    "https://arcaonline.ir/vila/3.jpg"
+                };
+
+                foreach (var photo in photos)
+                {
+                    await _botClient.SendPhotoAsync(
+                        chatId: callbackQuery.Message.Chat.Id,
+                        photo: photo);
+                }
+
+                await _botClient.SendTextMessageAsync(
+                    chatId: callbackQuery.Message.Chat.Id,
+                    text: "برای بازگشت به منو، گزینه‌ای را انتخاب کنید:",
+                    replyMarkup: GetMainMenuKeyboard());
                 break;
 
             case "contact_us":
