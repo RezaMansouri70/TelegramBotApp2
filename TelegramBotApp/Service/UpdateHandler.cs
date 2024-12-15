@@ -118,9 +118,12 @@ public class UpdateHandler : IUpdateHandler
     {
         var photoPaths = new[]
         {
-            "Files/villa1.jpg", // مسیر فایل تصویر اول
-            "Files/villa2.jpg", // مسیر فایل تصویر دوم
-            "Files/villa3.jpg"  // مسیر فایل تصویر سوم
+
+                    "https://arcaonline.ir/vila/1.jpg",
+                    "https://arcaonline.ir/vila/2.jpg",
+                    "https://arcaonline.ir/vila/4.jpg",
+
+                    "https://arcaonline.ir/vila/3.jpg"
         };
 
         foreach (var path in photoPaths)
