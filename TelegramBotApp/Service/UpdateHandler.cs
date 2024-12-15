@@ -123,9 +123,11 @@ public class UpdateHandler : IUpdateHandler
 
                 var photos = new[]
                 {
-                    "https://example.com/villa1.jpg",
-                    "https://example.com/villa2.jpg",
-                    "https://example.com/villa3.jpg"
+                    "https://arcaonline.ir/vila/1.jpg",
+                    "https://arcaonline.ir/vila/2.jpg",
+                    "https://arcaonline.ir/vila/4.jpg",
+
+                    "https://arcaonline.ir/vila/3.jpg"
                 };
 
                 foreach (var photo in photos)
