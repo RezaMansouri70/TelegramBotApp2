@@ -86,7 +86,7 @@ public class UpdateHandler : IUpdateHandler
                     replyMarkup: GetMainMenuKeyboard());
 
                 
-                   ,
+                   
 
                 // ارسال تصاویر
                 var photo1 = "https://arcaonline.ir/vila/2.jpg";
