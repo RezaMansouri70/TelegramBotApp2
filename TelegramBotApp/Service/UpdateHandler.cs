@@ -1,18 +1,16 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot.Types.InlineQueryResults;
-using Microsoft.Extensions.Logging;
+﻿using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
-using Microsoft.VisualBasic;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineQueryResults;
+using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot.Types;
+using Telegram.Bot;
 
 public class UpdateHandler : IUpdateHandler
 {
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<UpdateHandler> _logger;
-    private static readonly InputPollOption[] PollOptions = new[] { new InputPollOption("Hello"), new InputPollOption("World!") };
+    private static readonly InputPollOption[] PollOptions = new[] { new InputPollOption("سلام"), new InputPollOption("دنیا!") };
 
     public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger)
     {
@@ -22,10 +20,10 @@ public class UpdateHandler : IUpdateHandler
 
     public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Error occurred in UpdateHandler");
+        _logger.LogError(exception, "خطایی در UpdateHandler رخ داده است");
         if (exception is RequestException)
         {
-            // Add a small delay to avoid overloading
+            // تاخیر کوتاه برای جلوگیری از بار اضافی
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
         }
     }
@@ -33,7 +31,7 @@ public class UpdateHandler : IUpdateHandler
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        _logger.LogInformation("Handling update of type: {UpdateType}", update.Type);
+        _logger.LogInformation("در حال پردازش به‌روزرسانی از نوع: {UpdateType}", update.Type);
 
         try
         {
@@ -51,13 +49,13 @@ public class UpdateHandler : IUpdateHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception while processing update");
+            _logger.LogError(ex, "استثنا در هنگام پردازش به‌روزرسانی");
         }
     }
 
     private async Task OnMessage(Message msg)
     {
-        _logger.LogInformation("Received message of type: {MessageType}", msg.Type);
+        _logger.LogInformation("پیام دریافتی از نوع: {MessageType}", msg.Type);
 
         if (msg.Text is not { } messageText)
             return;
@@ -78,7 +76,7 @@ public class UpdateHandler : IUpdateHandler
         };
 
         var sentMessage = await response;
-        _logger.LogInformation("Message sent with ID: {MessageId}", sentMessage.MessageId);
+        _logger.LogInformation("پیام ارسال شد با شناسه: {MessageId}", sentMessage.MessageId);
     }
     async Task<Message> StartInlineQuery(Message msg)
     {
@@ -86,20 +84,21 @@ public class UpdateHandler : IUpdateHandler
         return await _botClient.SendMessage(msg.Chat, "Press the button to start Inline Query\n\n" +
             "(Make sure you enabled Inline Mode in @BotFather)", replyMarkup: new InlineKeyboardMarkup(button));
     }
+
     private async Task<Message> Usage(Message msg)
     {
         const string usage = @"
-            <b><u>Bot Commands</u></b>:
-            - /photo          : Send a photo
-            - /inline_buttons : Send inline buttons
-            - /keyboard       : Send reply keyboard
-            - /remove         : Remove keyboard
-            - /request        : Request contact or location
-            - /inline_mode    : Start inline query
-            - /poll           : Send a poll
-            - /poll_anonymous : Send an anonymous poll
-            - /throw          : Simulate error
-            ";
+<b><u>منوی دستورات ربات</u></b>:
+- /photo          : ارسال یک عکس
+- /inline_buttons : ارسال دکمه‌های اینلاین
+- /keyboard       : ارسال صفحه‌کلید پاسخ‌گو
+- /remove         : حذف صفحه‌کلید
+- /request        : درخواست مخاطب یا مکان
+- /inline_mode    : شروع کوئری اینلاین
+- /poll           : ارسال نظرسنجی
+- /poll_anonymous : ارسال نظرسنجی ناشناس
+- /throw          : شبیه‌سازی خطا
+";
         return await _botClient.SendTextMessageAsync(
             chatId: msg.Chat.Id,
             text: usage,
@@ -110,9 +109,9 @@ public class UpdateHandler : IUpdateHandler
     private async Task<Message> SendPhoto(Message msg)
     {
         await _botClient.SendChatActionAsync(msg.Chat.Id, ChatAction.UploadPhoto);
-        await Task.Delay(2000); // Simulate delay
+        await Task.Delay(2000); // شبیه‌سازی تاخیر
         await using var fileStream = new FileStream("Files/bot.gif", FileMode.Open, FileAccess.Read);
-        return await _botClient.SendPhotoAsync(msg.Chat.Id, new InputFileStream(fileStream), caption: "Read https://telegrambots.github.io/book/");
+        return await _botClient.SendPhotoAsync(msg.Chat.Id, new InputFileStream(fileStream), caption: "مطالعه کنید https://telegrambots.github.io/book/");
     }
 
     private async Task<Message> SendInlineKeyboard(Message msg)
@@ -121,14 +120,14 @@ public class UpdateHandler : IUpdateHandler
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("Button 1", "callback_data_1"),
-                InlineKeyboardButton.WithUrl("Visit GitHub", "https://github.com")
+                InlineKeyboardButton.WithCallbackData("دکمه 1", "callback_data_1"),
+                InlineKeyboardButton.WithUrl("بازدید از گیت‌هاب", "https://github.com")
             }
         });
 
         return await _botClient.SendTextMessageAsync(
             chatId: msg.Chat.Id,
-            text: "Choose an option:",
+            text: "یک گزینه انتخاب کنید:",
             replyMarkup: inlineKeyboard);
     }
 
@@ -136,8 +135,8 @@ public class UpdateHandler : IUpdateHandler
     {
         var replyKeyboard = new ReplyKeyboardMarkup(new[]
         {
-            new KeyboardButton[] { "Option 1", "Option 2" },
-            new KeyboardButton[] { "Option 3", "Option 4" }
+            new KeyboardButton[] { "گزینه 1", "گزینه 2" },
+            new KeyboardButton[] { "گزینه 3", "گزینه 4" }
         })
         {
             ResizeKeyboard = true
@@ -145,7 +144,7 @@ public class UpdateHandler : IUpdateHandler
 
         return await _botClient.SendTextMessageAsync(
             chatId: msg.Chat.Id,
-            text: "Select an option:",
+            text: "یک گزینه انتخاب کنید:",
             replyMarkup: replyKeyboard);
     }
 
@@ -153,7 +152,7 @@ public class UpdateHandler : IUpdateHandler
     {
         return await _botClient.SendTextMessageAsync(
             chatId: msg.Chat.Id,
-            text: "Keyboard removed.",
+            text: "صفحه‌کلید حذف شد.",
             replyMarkup: new ReplyKeyboardRemove());
     }
 
@@ -161,8 +160,8 @@ public class UpdateHandler : IUpdateHandler
     {
         var requestKeyboard = new ReplyKeyboardMarkup(new[]
         {
-            KeyboardButton.WithRequestContact("Share Contact"),
-            KeyboardButton.WithRequestLocation("Share Location")
+            KeyboardButton.WithRequestContact("اشتراک‌گذاری مخاطب"),
+            KeyboardButton.WithRequestLocation("اشتراک‌گذاری مکان")
         })
         {
             ResizeKeyboard = true
@@ -170,7 +169,7 @@ public class UpdateHandler : IUpdateHandler
 
         return await _botClient.SendTextMessageAsync(
             chatId: msg.Chat.Id,
-            text: "Share your contact or location:",
+            text: "مخاطب یا مکان خود را به اشتراک بگذارید:",
             replyMarkup: requestKeyboard);
     }
 
@@ -178,8 +177,8 @@ public class UpdateHandler : IUpdateHandler
     {
         return await _botClient.SendPollAsync(
             chatId: msg.Chat.Id,
-            question: "What is your favorite programming language?",
-            options: PollOptions.Select(p => new InputPollOption() { Text = p.Text } ),
+            question: "کدام زبان برنامه‌نویسی را ترجیح می‌دهید؟",
+            options: PollOptions.Select(p => new InputPollOption() { Text = p.Text }),
             isAnonymous: false);
     }
 
@@ -187,20 +186,20 @@ public class UpdateHandler : IUpdateHandler
     {
         return await _botClient.SendPollAsync(
             chatId: msg.Chat.Id,
-            question: "What is your favorite programming language?",
+            question: "کدام زبان برنامه‌نویسی را ترجیح می‌دهید؟",
             options: PollOptions.Select(p => new InputPollOption() { Text = p.Text }));
     }
 
     private Task<Message> FailingHandler(Message msg)
     {
-        throw new NotImplementedException("Simulated failure.");
+        throw new NotImplementedException("شبیه‌سازی خطا.");
     }
 
     private async Task OnCallbackQuery(CallbackQuery callbackQuery)
     {
-        _logger.LogInformation("Callback query received: {Data}", callbackQuery.Data);
+        _logger.LogInformation("کوئری بازگشتی دریافت شد: {Data}", callbackQuery.Data);
         await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
-        await _botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"You clicked: {callbackQuery.Data}");
+        await _botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"شما کلیک کردید: {callbackQuery.Data}");
     }
 
     private async Task OnInlineQuery(InlineQuery inlineQuery)
@@ -209,12 +208,12 @@ public class UpdateHandler : IUpdateHandler
         {
             new InlineQueryResultArticle(
                 id: "1",
-                title: "Telegram.Bot",
-                inputMessageContent: new InputTextMessageContent("Hello Telegram!")),
+                title: "تلگرام.بات",
+                inputMessageContent: new InputTextMessageContent("سلام تلگرام!")),
             new InlineQueryResultArticle(
                 id: "2",
-                title: "is awesome",
-                inputMessageContent: new InputTextMessageContent("Hello again!"))
+                title: "فوق‌العاده است",
+                inputMessageContent: new InputTextMessageContent("دوباره سلام!"))
         };
 
         await _botClient.AnswerInlineQueryAsync(
