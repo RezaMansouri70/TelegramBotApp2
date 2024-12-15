@@ -17,10 +17,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
-var botConfigSection = builder.Configuration.GetSection("BotConfiguration");
-builder.Services.Configure<BotConfiguration>(botConfigSection);
+
 builder.Services.AddHttpClient("tgwebhook").AddTypedClient<ITelegramBotClient>(
-    httpClient => new TelegramBotClient(botConfigSection.Get<BotConfiguration>()!.BotToken, httpClient));
+    httpClient => new TelegramBotClient("7657833224:AAE8Vn2ds2jhUg7Xyqst-K_rL-YWnuFNJFk", httpClient));
 builder.Services.AddSingleton<UpdateHandler>();
 builder.Services.ConfigureTelegramBotMvc();
 var app = builder.Build();
