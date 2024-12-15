@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Serialization;
+using Telegram.Bot;
+using TelegramBotApp.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +17,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
-
+var botConfigSection = builder.Configuration.GetSection("BotConfiguration");
+builder.Services.Configure<BotConfiguration>(botConfigSection);
+builder.Services.AddHttpClient("tgwebhook").AddTypedClient<ITelegramBotClient>(
+    httpClient => new TelegramBotClient(botConfigSection.Get<BotConfiguration>()!.BotToken, httpClient));
+builder.Services.AddSingleton<UpdateHandler>();
+builder.Services.ConfigureTelegramBotMvc();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
