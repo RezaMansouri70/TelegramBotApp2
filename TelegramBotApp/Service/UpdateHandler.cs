@@ -79,10 +79,28 @@ public class UpdateHandler : IUpdateHandler
         switch (callbackQuery.Data)
         {
             case "view_properties":
+                // ارسال پیام متنی
                 await _botClient.SendTextMessageAsync(
                     chatId: callbackQuery.Message!.Chat.Id,
                     text: "لیست املاک موجود:\n1. آپارتمان 85 متری - قیمت: 3 میلیارد تومان\n2. ویلا دوبلکس 200 متری - قیمت: 7 میلیارد تومان",
                     replyMarkup: GetMainMenuKeyboard());
+
+                
+                   ,
+
+                // ارسال تصاویر
+                var photo1 = "https://arcaonline.ir/vila/2.jpg";
+                var photo2 = "https://arcaonline.ir/vila/4.jpg";
+
+                await _botClient.SendPhotoAsync(
+                    chatId: callbackQuery.Message!.Chat.Id,
+                    photo: photo1
+                );
+
+                await _botClient.SendPhotoAsync(
+                    chatId: callbackQuery.Message!.Chat.Id,
+                    photo: photo2
+                );
                 break;
 
             case "request_consultation":
