@@ -1,6 +1,4 @@
-﻿
-
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -83,63 +81,25 @@ public class UpdateHandler : IUpdateHandler
             case "view_properties":
                 await _botClient.SendTextMessageAsync(
                     chatId: callbackQuery.Message!.Chat.Id,
-                    text: "لیست املاک موجود:1.آپارتمان 85 متری - قیمت: 3 میلیارد تومان 2.ویلا دوبلکس 200 متری - قیمت: 7 میلیارد تومان",
+                    text: "لیست املاک موجود:\n1. آپارتمان 85 متری - قیمت: 3 میلیارد تومان\n2. ویلا دوبلکس 200 متری - قیمت: 7 میلیارد تومان",
                     replyMarkup: GetMainMenuKeyboard());
                 break;
 
             case "request_consultation":
                 await _botClient.SendTextMessageAsync(
                     chatId: callbackQuery.Message!.Chat.Id,
-                    text: "برای مشاوره با کارشناسان ما، شماره تماس خود را وارد کنید یا با ما تماس بگیرید: 09123456789",
+                    text: "برای مشاوره با کارشناس ما به این آیدی پیام دهید:\n@alireza_ghassmi",
                     replyMarkup: GetMainMenuKeyboard());
                 break;
 
-            case "search_properties":
-                await _botClient.SendTextMessageAsync(
-                    chatId: callbackQuery.Message!.Chat.Id,
-                    text: "لطفاً مشخصات ملک مورد نظر خود را وارد کنید (مثلاً متراژ، منطقه، قیمت) تا جستجو انجام شود.",
-                    replyMarkup: GetMainMenuKeyboard());
+            case "view_villa_photos":
+                await SendVillaPhotos(callbackQuery.Message!.Chat.Id);
                 break;
 
             case "contact_us":
                 await _botClient.SendTextMessageAsync(
                     chatId: callbackQuery.Message!.Chat.Id,
-                    text: "تماس با ما: 📞 09123456789 📧 info@amlakvenus.com",
-                    replyMarkup: GetMainMenuKeyboard());
-                break;
-
-            case "office_location":
-                await _botClient.SendLocationAsync(
-                    chatId: callbackQuery.Message!.Chat.Id,
-                    latitude: 36.5711, // مختصات نمونه برای دفتر
-                    longitude: 52.0009,
-                    replyMarkup: GetMainMenuKeyboard());
-                break;
-
-            case "view_villa_photos":
-                await _botClient.SendTextMessageAsync(
-                    chatId: callbackQuery.Message!.Chat.Id,
-                    text: "تصاویر ویلاهای منتخب:");
-
-                var photos = new[]
-                {
-                    "https://arcaonline.ir/vila/1.jpg",
-                    "https://arcaonline.ir/vila/2.jpg",
-                    "https://arcaonline.ir/vila/4.jpg",
-
-                    "https://arcaonline.ir/vila/3.jpg"
-                };
-
-                foreach (var photo in photos)
-                {
-                    await _botClient.SendPhotoAsync(
-                        chatId: callbackQuery.Message.Chat.Id,
-                        photo: photo);
-                }
-
-                await _botClient.SendTextMessageAsync(
-                    chatId: callbackQuery.Message.Chat.Id,
-                    text: "برای بازگشت به منو، گزینه‌ای را انتخاب کنید:",
+                    text: "تماس با ما:\n📞 09195636195",
                     replyMarkup: GetMainMenuKeyboard());
                 break;
 
@@ -152,6 +112,27 @@ public class UpdateHandler : IUpdateHandler
         }
 
         await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
+    }
+
+    private async Task SendVillaPhotos(long chatId)
+    {
+        var photoPaths = new[]
+        {
+            "Files/villa1.jpg", // مسیر فایل تصویر اول
+            "Files/villa2.jpg", // مسیر فایل تصویر دوم
+            "Files/villa3.jpg"  // مسیر فایل تصویر سوم
+        };
+
+        foreach (var path in photoPaths)
+        {
+            await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            await _botClient.SendPhotoAsync(
+                chatId: chatId,
+                photo: new InputFileStream(stream),
+                caption: "تصاویر ویلاهای نمونه املاک ونوس");
+        }
+
+        await _botClient.SendTextMessageAsync(chatId, "این تصاویر بخشی از ویلاهای ما هستند. برای اطلاعات بیشتر با ما تماس بگیرید.", replyMarkup: GetMainMenuKeyboard());
     }
 
     private Task HandleUnknownUpdate(Update update)
@@ -172,7 +153,7 @@ public class UpdateHandler : IUpdateHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            text: "راهنمای ربات:/ start - نمایش منوی اصلی / help - نمایش راهنما",
+            text: "راهنمای ربات:\n/start - نمایش منوی اصلی\n/help - نمایش راهنما",
             replyMarkup: GetMainMenuKeyboard());
     }
 
@@ -187,13 +168,8 @@ public class UpdateHandler : IUpdateHandler
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("جستجوی املاک", "search_properties"),
+                InlineKeyboardButton.WithCallbackData("تماشای تصاویر ویلاها", "view_villa_photos"),
                 InlineKeyboardButton.WithCallbackData("تماس با ما", "contact_us")
-            },
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("موقعیت دفتر", "office_location"),
-                InlineKeyboardButton.WithCallbackData("تصاویر ویلاها", "view_villa_photos")
             }
         });
     }
@@ -203,7 +179,6 @@ public class UpdateHandler : IUpdateHandler
         throw new NotImplementedException();
     }
 }
-
 
 
 //using Telegram.Bot.Exceptions;
