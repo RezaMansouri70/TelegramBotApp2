@@ -60,7 +60,9 @@ public class UpdateHandler : IUpdateHandler
             case "/help":
                 await SendHelp(message);
                 break;
-
+            case "/create_link":
+                await GenerateGroupInviteLink(message);
+                break;
             default:
                 await _botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
@@ -68,7 +70,31 @@ public class UpdateHandler : IUpdateHandler
                 break;
         }
     }
+    private async Task GenerateGroupInviteLink(Message message)
+    {
+        if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "این دستور فقط در گروه‌ها قابل استفاده است.");
+            return;
+        }
 
+        try
+        {
+            var inviteLink = await _botClient.ExportChatInviteLinkAsync(message.Chat.Id);
+            await _botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: $"لینک دعوت گروه:\n{inviteLink}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "خطا در ایجاد لینک دعوت.");
+            await _botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "متأسفانه در ایجاد لینک دعوت خطایی رخ داد.");
+        }
+    }
     private async Task OnCallbackQueryReceived(CallbackQuery callbackQuery)
     {
         _logger.LogInformation("درخواست دکمه کلیک شد: {Data}", callbackQuery.Data);
