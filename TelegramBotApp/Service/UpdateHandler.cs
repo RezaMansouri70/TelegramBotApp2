@@ -172,7 +172,7 @@ public class UpdateHandler : IUpdateHandler
                 var inviteLink = await _botClient.ExportChatInviteLinkAsync(callbackQuery.Message.Chat.Id);
                 await _botClient.SendTextMessageAsync(
                     chatId: callbackQuery.Message.Chat.Id,
-                    text: $"لینک دعوت گروه:\n{inviteLink}"و
+                    text: $"لینک دعوت گروه:\n{inviteLink}",
                 replyMarkup: GetMainMenuKeyboard());
 
                 break;
