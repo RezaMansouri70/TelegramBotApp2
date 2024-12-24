@@ -125,8 +125,8 @@ public class UpdateHandler : IUpdateHandler
 
                 await _botClient.SendPhotoAsync(
                     chatId: callbackQuery.Message!.Chat.Id,
-                    photo: photo2
-                );
+                    photo: photo2,
+                    replyMarkup: GetMainMenuKeyboard());
                 break;
 
             case "request_consultation":
